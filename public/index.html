@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Agent MVP (Ephemeral Keys)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Voice Agent 6</h1>
+      <div class="status" id="status">Disconnected</div>
+    </div>
+
+    <div class="voice-visualizer">
+      <canvas id="waveform" width="400" height="100"></canvas>
+    </div>
+
+    <div class="controls">
+      <button id="connectBtn" class="btn btn-primary">Connect</button>
+      <button id="disconnectBtn" class="btn btn-secondary" disabled>Disconnect</button>
+    </div>
+
+    <div class="info">
+      <p class="hint">Click Connect, speak, then pause for ~1s</p>
+      <div id="transcript" class="transcript"></div>
+    </div>
+  </div>
+
+  <!-- Config/VoiceAgent as classic scripts (attach globals) -->
+  <script src="config.js"></script>
+  <script src="voiceAgent.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
