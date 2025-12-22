@@ -28,6 +28,27 @@ body {
     margin-bottom: 30px;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+
+
 .header h1 {
     color: #333;
     font-size: 2em;
@@ -145,7 +166,7 @@ body {
 }
 
 .transcript:empty::before {
-    content: "Conversation will appear here...";
+    content: attr(data-placeholder);
     color: #999;
 }
 

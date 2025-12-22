@@ -3,15 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Voice Agent MVP (Ephemeral Keys)</title>
+  <title>Voice Agent MVP (WebRTC + Ephemeral Keys)</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Voice Agent 6</h1>
+      <div class="header-left">
+        <img
+          src="images/brenda-avatar.png"
+          alt="Brenda"
+          class="avatar"
+          id="brendaAvatar"
+        />
+        <h1>Brenda</h1>
+      </div>
       <div class="status" id="status">Disconnected</div>
     </div>
+
 
     <div class="voice-visualizer">
       <canvas id="waveform" width="400" height="100"></canvas>
@@ -23,12 +32,11 @@
     </div>
 
     <div class="info">
-      <p class="hint">Click Connect, speak, then pause for ~1s</p>
+      <p class="hint" id="hintText">Click Connect, speak, then pause ~1s.</p>
       <div id="transcript" class="transcript"></div>
     </div>
   </div>
 
-  <!-- Config/VoiceAgent as classic scripts (attach globals) -->
   <script src="config.js"></script>
   <script src="voiceAgent.js"></script>
   <script type="module" src="app.js"></script>

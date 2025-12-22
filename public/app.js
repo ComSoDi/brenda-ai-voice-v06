@@ -1,52 +1,60 @@
-// app.js (module)
-// UI wiring only
+// public/app.js (module)
+import { detectLocale } from "./locale.js";
+import { t } from "./i18n.js";
 
 class VoiceAgentApp {
   constructor() {
     this.agent = new window.VoiceAgent();
-    this.transcriptBuffer = { user: '', assistant: '' };
+    this.transcriptBuffer = { user: "", assistant: "" };
+
+    this.locale = detectLocale(); // { lang, variant }
 
     this.elements = {
-      status: document.getElementById('status'),
-      connectBtn: document.getElementById('connectBtn'),
-      disconnectBtn: document.getElementById('disconnectBtn'),
-      transcript: document.getElementById('transcript'),
-      canvas: document.getElementById('waveform'),
+      status: document.getElementById("status"),
+      connectBtn: document.getElementById("connectBtn"),
+      disconnectBtn: document.getElementById("disconnectBtn"),
+      hintText: document.getElementById("hintText"),
+      transcript: document.getElementById("transcript"),
+      canvas: document.getElementById("waveform")
     };
 
-    this.canvasCtx = this.elements.canvas.getContext('2d');
+    this.canvasCtx = this.elements.canvas.getContext("2d");
     this.audioData = new Float32Array(128);
 
-    this.initialize();
+    this.init();
   }
 
-  initialize() {
-    this.elements.connectBtn.addEventListener('click', () => this.connect());
-    this.elements.disconnectBtn.addEventListener('click', () => this.disconnect());
+  init() {
+    this.elements.connectBtn.textContent = t(this.locale.variant, "connect");
+    this.elements.disconnectBtn.textContent = t(this.locale.variant, "disconnect");
+    if (this.elements.hintText) this.elements.hintText.textContent = t(this.locale.variant, "hint");
+    this.elements.status.textContent = t(this.locale.variant, "disconnected");
+    this.elements.transcript.setAttribute(
+      "data-placeholder",
+      t(this.locale.variant, "placeholder")
+    );
 
-    this.agent.onStatusChange = (status) => this.updateStatus(status);
+    this.elements.connectBtn.addEventListener("click", () => this.connect());
+    this.elements.disconnectBtn.addEventListener("click", () => this.disconnect());
+
+    this.agent.onStatusChange = (s) => this.updateStatus(s);
     this.agent.onTranscript = (role, text) => this.addTranscript(role, text);
     this.agent.onAudioData = (data) => this.updateWaveform(data);
-    this.agent.onError = (error) => this.showError(error);
+    this.agent.onError = (err) => this.showError(err);
 
     this.animateWaveform();
-    console.log('Voice Agent initialized');
-  }
-
-  getUserIdForVoice() {
-    return 'anon';
   }
 
   async connect() {
     try {
       this.elements.connectBtn.disabled = true;
-      this.elements.transcript.innerHTML = '';
-      this.transcriptBuffer = { user: '', assistant: '' };
+      this.elements.transcript.innerHTML = "";
+      this.transcriptBuffer = { user: "", assistant: "" };
 
-      await this.agent.connect(this.getUserIdForVoice());
+      await this.agent.connect("anon", this.locale.variant);
     } catch (e) {
-      console.error('Connect failed:', e);
-      alert('Connect failed: ' + e.message);
+      console.error(e);
+      alert("Connect failed: " + e.message);
       this.elements.connectBtn.disabled = false;
     }
   }
@@ -56,24 +64,24 @@ class VoiceAgentApp {
   }
 
   updateStatus(status) {
-    this.elements.status.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-    this.elements.status.className = 'status ' + status;
+    const labelKey =
+      status === "disconnected" ? "disconnected" :
+      status === "connecting" ? "connecting" :
+      status === "connected" ? "connected" :
+      status === "speaking" ? "speaking" : status;
 
-    switch (status) {
-      case 'connected':
-        this.elements.connectBtn.disabled = true;
-        this.elements.disconnectBtn.disabled = false;
-        break;
-      case 'disconnected':
-      case 'error':
-        this.elements.connectBtn.disabled = false;
-        this.elements.disconnectBtn.disabled = true;
-        break;
-      case 'connecting':
-      case 'speaking':
-        this.elements.connectBtn.disabled = true;
-        this.elements.disconnectBtn.disabled = true;
-        break;
+    this.elements.status.textContent = t(this.locale.variant, labelKey);
+    this.elements.status.className = "status " + status;
+
+    if (status === "connected") {
+      this.elements.connectBtn.disabled = true;
+      this.elements.disconnectBtn.disabled = false;
+    } else if (status === "disconnected" || status === "error") {
+      this.elements.connectBtn.disabled = false;
+      this.elements.disconnectBtn.disabled = true;
+    } else {
+      this.elements.connectBtn.disabled = true;
+      this.elements.disconnectBtn.disabled = true;
     }
   }
 
@@ -83,78 +91,66 @@ class VoiceAgentApp {
   }
 
   renderTranscript() {
-    let html = '';
+    const esc = (t0) => {
+      const d = document.createElement("div");
+      d.textContent = t0;
+      return d.innerHTML;
+    };
 
+    let html = "";
     if (this.transcriptBuffer.user) {
       html += `
         <div class="transcript-item">
-          <div class="transcript-label">You:</div>
-          <div>${this.escapeHtml(this.transcriptBuffer.user)}</div>
-        </div>
-      `;
+          <div class="transcript-label">${t(this.locale.variant, "youLabel")}</div>
+          <div>${esc(this.transcriptBuffer.user)}</div>
+        </div>`;
     }
 
     if (this.transcriptBuffer.assistant) {
       html += `
         <div class="transcript-item">
-          <div class="transcript-label assistant">Assistant:</div>
-          <div>${this.escapeHtml(this.transcriptBuffer.assistant)}</div>
-        </div>
-      `;
+          <div class="transcript-label assistant">${t(this.locale.variant, "assistantLabel")}</div>
+          <div>${esc(this.transcriptBuffer.assistant)}</div>
+        </div>`;
     }
-
     this.elements.transcript.innerHTML = html;
     this.elements.transcript.scrollTop = this.elements.transcript.scrollHeight;
   }
 
-  updateWaveform(data) {
-    const step = Math.floor(data.length / this.audioData.length);
+  updateWaveform(floatTimeDomain) {
+    const step = Math.floor(floatTimeDomain.length / this.audioData.length);
     for (let i = 0; i < this.audioData.length; i++) {
-      this.audioData[i] = Math.abs(data[i * step]) || 0;
+      this.audioData[i] = Math.abs(floatTimeDomain[i * step]) || 0;
     }
   }
 
   animateWaveform() {
-    const canvas = this.elements.canvas;
+    const c = this.elements.canvas;
     const ctx = this.canvasCtx;
-    const width = canvas.width;
-    const height = canvas.height;
+    ctx.fillStyle = "#f5f5f5";
+    ctx.fillRect(0, 0, c.width, c.height);
 
-    ctx.fillStyle = '#f5f5f5';
-    ctx.fillRect(0, 0, width, height);
-
-    ctx.strokeStyle = '#667eea';
+    ctx.strokeStyle = "#667eea";
     ctx.lineWidth = 2;
     ctx.beginPath();
-
-    const sliceWidth = width / this.audioData.length;
+    const slice = c.width / this.audioData.length;
     let x = 0;
-
     for (let i = 0; i < this.audioData.length; i++) {
-      const v = this.audioData[i];
-      const y = height / 2 + (v * height) / 2;
+      const y = c.height / 2 + (this.audioData[i] * c.height) / 2;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
-      x += sliceWidth;
+      x += slice;
     }
-
-    ctx.lineTo(width, height / 2);
+    ctx.lineTo(c.width, c.height / 2);
     ctx.stroke();
-
     requestAnimationFrame(() => this.animateWaveform());
   }
 
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  showError(error) {
-    alert('Error: ' + (error?.message || String(error)));
+  showError(err) {
+    alert("Error: " + (err?.message || String(err)));
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   window.__app = new VoiceAgentApp();
 });
