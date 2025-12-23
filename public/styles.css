@@ -25,7 +25,7 @@ body {
 
 .header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 2px;
 }
 
 .header {
@@ -82,17 +82,20 @@ body {
 
 .voice-visualizer {
     background: #f5f5f5;
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 10px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    margin-bottom: 15px;
 }
 
 #waveform {
     display: block;
+    width: 100%;
+    height: 60px;        /* your reduced height */
 }
 
 .controls {
@@ -149,15 +152,17 @@ body {
 .hint {
     color: #666;
     font-size: 0.95em;
+    margin-top: 0px;
     margin-bottom: 20px;
+    text-align: right
 }
 
 .transcript {
     background: #f9f9f9;
     border-radius: 10px;
     padding: 20px;
-    min-height: 100px;
-    max-height: 200px;
+    min-height: 200px;
+    max-height: 400px;
     overflow-y: auto;
     text-align: left;
     font-size: 0.95em;
@@ -204,4 +209,41 @@ body {
 
 .status.connected {
     animation: pulse 2s ease-in-out infinite;
+}
+
+/* Visually hidden (still accessible) */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.btn-toggle {
+  height: 48px;              /* match avatar height */
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 0;
+  font-weight: 700;
+  font-size: 18px;   /* ← change this */
+  cursor: pointer;
+  margin-bottom: 0px;
+}
+
+.btn-toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-connect {
+  background: #16a34a;       /* green */
+  color: white;
+}
+
+.btn-disconnect {
+  background: #dc2626;       /* red */
+  color: white;
 }

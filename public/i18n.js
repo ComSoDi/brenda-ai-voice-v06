@@ -9,7 +9,7 @@ const STRINGS = {
     connecting: "Connecting",
     connected: "Connected",
     speaking: "Speaking",
-    hint: "Click Connect, speak, then pause ~1s.",
+    hint: "Connect and speak with pauses",
     placeholder: "Conversation will appear here...",
     youLabel: "You",
     assistantLabel: "Brenda"
@@ -21,19 +21,19 @@ const STRINGS = {
     connecting: "Connecting",
     connected: "Connected",
     speaking: "Speaking",
-    hint: "Click Connect, speak, then pause ~1s.",
+    hint: "Connect and speak with pauses",
     placeholder: "Conversation will appear here...",
     youLabel: "You",
     assistantLabel: "Brenda"
   },
   "es-ES": {
-    connect: "Conectar",
+    connect: "Conecta",
     disconnect: "Desconectar",
     disconnected: "Desconectada",
     connecting: "Conectando",
     connected: "Conectada",
     speaking: "Hablando",
-    hint: "Pulsa Conectar, habla y luego haz una pausa de ~1 s.",
+    hint: "Conecta y habla con pausas",
     placeholder: "La conversación aparecerá aquí...",
     youLabel: "Tú",
     assistantLabel: "Brenda"
@@ -45,7 +45,7 @@ const STRINGS = {
     connecting: "Conectando",
     connected: "Conectada",
     speaking: "Hablando",
-    hint: "Haz clic en Conectar, habla y luego haz una pausa de ~1 s.",
+    hint: "Conecta y habla con pausas",
     placeholder: "La conversación aparecerá aquí...",
     youLabel: "Tú",
     assistantLabel: "Brenda"
